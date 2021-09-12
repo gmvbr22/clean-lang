@@ -14,23 +14,27 @@ func NewPackage(name string) *NPackage {
 }
 
 type NClass struct {
-	Name string
+	Expose bool
+	Name   string
 }
 
-func NewClass(name string, p *NPackage) *NClass {
+func NewClass(name string, expose bool, p *NPackage) *NClass {
 	c := new(NClass)
 	c.Name = name
+	c.Expose = expose
 	p.ClassList = append(p.ClassList, c)
 	return c
 }
 
 type NInterface struct {
-	Name string
+	Expose bool
+	Name   string
 }
 
-func NewInterface(name string, p *NPackage) *NInterface {
-	c := new(NInterface)
-	c.Name = name
-	p.InterfaceList = append(p.InterfaceList, c)
-	return c
+func NewInterface(name string, expose bool, p *NPackage) *NInterface {
+	i := new(NInterface)
+	i.Name = name
+	i.Expose = expose
+	p.InterfaceList = append(p.InterfaceList, i)
+	return i
 }

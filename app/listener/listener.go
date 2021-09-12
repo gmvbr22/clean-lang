@@ -1,6 +1,8 @@
 package listener
 
 import (
+	"fmt"
+
 	"github.com/gmvbr/clean-lang/app/lang_types"
 	"github.com/gmvbr/clean-lang/app/parser"
 )
@@ -36,12 +38,23 @@ func (tree *TreeLangListener) EnterProgram(ctx *parser.ProgramContext) {
  * @annotation(arg1=value, arg2=value) modifier class {}
  */
 func ParseClass(ctx *parser.NClassContext, p *lang_types.NPackage) {
-	lang_types.NewClass(ctx.Identifier().GetText(), p)
+	modifier := ctx.Modifier()
+	expose := true
+	if modifier != nil {
+		expose = modifier.GetText() == "public"
+	}
+	fmt.Println(expose)
+	lang_types.NewClass(ctx.Identifier().GetText(), expose, p)
 }
 
 /**
  * modifier interface {}
  */
 func ParseInterface(ctx *parser.NInterfaceContext, p *lang_types.NPackage) {
-	lang_types.NewInterface(ctx.Identifier().GetText(), p)
+	modifier := ctx.Modifier()
+	expose := true
+	if modifier != nil {
+		expose = modifier.GetText() == "public"
+	}
+	lang_types.NewInterface(ctx.Identifier().GetText(), expose, p)
 }
