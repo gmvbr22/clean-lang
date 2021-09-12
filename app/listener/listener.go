@@ -2,6 +2,7 @@ package listener
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/gmvbr/clean-lang/app/lang_types"
 	"github.com/gmvbr/clean-lang/app/parser"
@@ -43,8 +44,12 @@ func ParseClass(ctx *parser.NClassContext, p *lang_types.NPackage) {
 	if modifier != nil {
 		expose = modifier.GetText() == "public"
 	}
-	fmt.Println(expose)
-	lang_types.NewClass(ctx.Identifier().GetText(), expose, p)
+	c := lang_types.NewClass(ctx.Identifier().GetText(), expose, p)
+	
+	for _, v := range ctx.AllAnnotation() {
+		a := ParseAnnotation(v.(*parser.AnnotationContext))
+		c.AnnotationList = append(c.AnnotationList, a)
+	}
 }
 
 /**
@@ -57,4 +62,34 @@ func ParseInterface(ctx *parser.NInterfaceContext, p *lang_types.NPackage) {
 		expose = modifier.GetText() == "public"
 	}
 	lang_types.NewInterface(ctx.Identifier().GetText(), expose, p)
+}
+
+/**
+ * modifier interface {}
+ */
+func ParseAnnotation(ctx *parser.AnnotationContext) *lang_types.NAnnotation {
+	a := lang_types.NewAnnotation(ctx.Identifier().GetText())
+
+	for _, v := range ctx.AllKey_value() {
+		a.Values = append(a.Values, ParseKeyValue(v.(*parser.Key_valueContext)))
+	}
+	return a
+}
+
+func ParseKeyValue(ctx *parser.Key_valueContext) *lang_types.KeyValue {
+
+	k := ctx.Identifier().GetText()
+	v := ctx.Value().(*parser.ValueContext)
+
+	var nv interface{}
+	if t := v.INTEGER(); t != nil {
+		integer, err := strconv.Atoi(t.GetText())
+		if err != nil {
+			panic(fmt.Errorf("%s invalid INTEGER", k))
+		}
+		nv = integer
+	}
+
+	a := lang_types.NewKeyValue(k, nv)
+	return a
 }

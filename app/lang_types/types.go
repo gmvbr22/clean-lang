@@ -14,8 +14,9 @@ func NewPackage(name string) *NPackage {
 }
 
 type NClass struct {
-	Expose bool
-	Name   string
+	Expose         bool
+	Name           string
+	AnnotationList []*NAnnotation
 }
 
 func NewClass(name string, expose bool, p *NPackage) *NClass {
@@ -36,5 +37,29 @@ func NewInterface(name string, expose bool, p *NPackage) *NInterface {
 	i.Name = name
 	i.Expose = expose
 	p.InterfaceList = append(p.InterfaceList, i)
+	return i
+}
+
+type NAnnotation struct {
+	Name   string
+	Values []*KeyValue
+}
+
+type KeyValue struct {
+	Name  string
+	Value interface{}
+}
+
+func NewAnnotation(name string) *NAnnotation {
+	i := new(NAnnotation)
+	i.Name = name
+	i.Values = []*KeyValue{}
+	return i
+}
+
+func NewKeyValue(name string, value interface{}) *KeyValue {
+	i := new(KeyValue)
+	i.Name = name
+	i.Value = value
 	return i
 }
