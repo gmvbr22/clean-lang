@@ -14,24 +14,34 @@ func NewTreeLangListener() *TreeLangListener {
 }
 
 /**
- * package name; 
- * 
+ * package name;
+ *
  * => class
  * => interface
  */
-func (tree *TreeLangListener) EnterProgram(c *parser.ProgramContext) {
+func (tree *TreeLangListener) EnterProgram(ctx *parser.ProgramContext) {
+	namespace := ctx.Namespace().(*parser.NamespaceContext)
 
-	namespace := c.Namespace().(*parser.NamespaceContext)
+	p := lang_types.NewPackage(namespace.PACKAGE_NAME().GetText())
 
-	pkg := new(lang_types.NPackage)
-	pkg.Name = namespace.PACKAGE_NAME().GetText()
-
-	nclass := c.AllNClass()
-	for _, value := range nclass {
-		ParseClass(&value, pkg)
+	for _, v := range ctx.AllNClass() {
+		ParseClass(v.(*parser.NClassContext), p)
+	}
+	for _, v := range ctx.AllNInterface() {
+		ParseInterface(v.(*parser.NInterfaceContext), p)
 	}
 }
 
-func ParseClass(ctx *parser.INClassContext, pkg *lang_types.NPackage) {
+/**
+ * @annotation(arg1=value, arg2=value) modifier class {}
+ */
+func ParseClass(ctx *parser.NClassContext, p *lang_types.NPackage) {
+	lang_types.NewClass(ctx.Identifier().GetText(), p)
+}
 
+/**
+ * modifier interface {}
+ */
+func ParseInterface(ctx *parser.NInterfaceContext, p *lang_types.NPackage) {
+	lang_types.NewInterface(ctx.Identifier().GetText(), p)
 }
